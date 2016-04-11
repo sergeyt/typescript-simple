@@ -10,9 +10,10 @@ declare namespace tss {
         /**
          * @param {ts.CompilerOptions=} options TypeScript compile options (some options are ignored)
          * @param {boolean=} doSemanticChecks Throw if TypeScript semantic error found (default: true)
+         * @param {Array<string>=} files Array of TypeScript files to load (default: [])
          * @constructor
          */
-        constructor(options?: ts.CompilerOptions, doSemanticChecks?: boolean);
+        constructor(options?: ts.CompilerOptions, doSemanticChecks?: boolean, files?: Array<string>);
         /**
          * @param {string} code TypeScript source code to compile
          * @param {string=} fileName Only needed if you plan to use sourceMaps.

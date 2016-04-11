@@ -25,9 +25,10 @@ namespace tss {
         /**
          * @param {ts.CompilerOptions=} options TypeScript compile options (some options are ignored)
          * @param {boolean=} doSemanticChecks Throw if TypeScript semantic error found (default: true)
+         * @param {Array<string>=} files Array of TypeScript files to load (default: []) 
          * @constructor
          */
-        constructor(options: ts.CompilerOptions = {}, private doSemanticChecks = true) {
+        constructor(options: ts.CompilerOptions = {}, private doSemanticChecks = true, files: Array<string> = []) {
             // accept null
             options = options || {};
             if (options.target == null) {
@@ -37,6 +38,10 @@ namespace tss {
                 options.module = ts.ModuleKind.None;
             }
             this.options = options;
+            files.forEach(f => {
+                const code = fs.readFileSync(f, 'utf8');
+                this.files[f] = { version: 0, text: code };
+            });
         }
 
         /**
@@ -81,6 +86,12 @@ namespace tss {
                 getScriptFileNames: () => [this.getDefaultLibFileName(this.options)].concat(Object.keys(this.files)),
                 getScriptVersion: (fileName) => this.files[fileName] && this.files[fileName].version.toString(),
                 getScriptSnapshot: (fileName) => {
+                    if (!this.files[fileName]) {
+                        if (fs.existsSync(fileName)) {
+                            const code = fs.readFileSync(fileName, 'utf8');
+                            this.files[fileName] = { version: 0, text: code };
+                        }
+                    }
                     let file = this.files[fileName];
                     if (file) {
                         return {
